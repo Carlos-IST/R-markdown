@@ -1,0 +1,730 @@
+---
+title: "Análisis Terremoto"
+author: "Carlos Santillán"
+date: "4 de octubre de 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Vemos nuestro directorio
+```{r}
+getwd()
+```
+
+### Cambiamos a la carpeta con los archivos
+```{r}
+setwd("C:/Users/...")
+
+getwd()
+```
+
+
+### Paquetería a usar
+```{r}
+#install.packages("dplyr")
+#install.packages("pastecs")
+#install.packages("stringi")
+
+library("dplyr")
+library("pastecs")
+#library("stringi")
+```
+
+### Inicializamos Variables
+```{r}
+precartera.tev <- NULL
+
+siniestralidad.tev <- NULL
+
+tev.emision <- NULL
+
+tev.suma.asegurada <- NULL
+
+tev.siniestros <- NULL
+
+#id.year.emision <- NULL
+
+```
+
+### Importamos las Emisiones de 2015 a 2016
+```{r}
+for (i in 1:2){
+  tev.emision[[i]] <- read.csv(paste("C:/Users/...", i+2014," Terremoto Bases EM.csv", sep = ""), stringsAsFactors = FALSE)
+  #id.year.emision[i] <- paste("year.emision", i+2014, sep = "")
+} 
+```
+
+### Visualizamos un año
+Recordemos que: 1 es 2015 y 2 es 2016
+```{r}
+tev.emision[2]
+```
+
+### Obtenemos los nombres de las variables
+```{r}
+names(tev.emision[[2]])
+names(tev.emision[[1]])
+
+```
+
+Concluimos que 2015 y 2016 **tienen los mismos atributos**, podemos unir los data frames
+
+### Unimos (verticalmente) los dataframes para los años 2015 y 2016
+```{r}
+tev.emision.hist <- rbind(tev.emision[[2]], tev.emision[[1]])
+
+head(tev.emision.hist)   # Visualizamos primeros registros
+
+tail(tev.emision.hist)   # Visualizamos últimos registros
+
+
+```
+ 
+Podemos confirmar mediante la visualización que la unión de las tablas fue correcta
+
+### Revisamos las variables del dataframe resultante de la unión
+```{r}
+str(tev.emision.hist)
+```
+
+### Revisamos atributos
+```{r}
+str(tev.emision.hist)
+
+head(tev.emision.hist)
+
+tail(tev.emision.hist)
+```
+
+## Suma Asegurada
+
+### Importamos las Sumas Aseguradas de 2015 a 2016
+```{r}
+for (i in 1:2){
+  tev.suma.asegurada[[i]] <- read.csv(paste("C:/Users/...", i+2014," Terremoto Bases SA.csv", sep = ""), stringsAsFactors = FALSE)
+  #id.year.emision[i] <- paste("year.emision", i+2014, sep = "")
+} 
+```
+
+### Visualizamos un año
+Recordemos que: 1 es 2015 y 2 es 2016
+```{r}
+tev.suma.asegurada[2]
+```
+
+### Obtenemos los nombres de las variables
+```{r}
+names(tev.suma.asegurada[[2]])
+names(tev.suma.asegurada[[1]])
+```
+
+Concluimos que 2015 y 2016 **tienen los mismos atributos**, podemos unir los data frames
+
+### Unimos (verticalmente) los dataframes para los años 2015 y 2016
+```{r}
+tev.suma.asegurada.hist <- rbind(tev.suma.asegurada[[2]], tev.suma.asegurada[[1]])
+
+head(tev.suma.asegurada.hist)   # Visualizamos primeros registros
+
+tail(tev.suma.asegurada.hist)   # Visualizamos últimos registros
+
+
+```
+
+Podemos confirmar mediante la visualización que la unión de las tablas fue correcta
+
+### Revisamos las variables del dataframe resultante de la unión
+```{r}
+str(tev.suma.asegurada.hist)
+```
+
+### Revisamos atributos
+```{r}
+str(diversos.suma.asegurada.hist)
+
+head(diversos.suma.asegurada.hist)
+
+tail(diversos.suma.asegurada.hist)
+```
+
+
+
+## Siniestros
+
+### Importamos los Siniestros de 2015 a 2016
+```{r}
+for (i in 1:2){
+  tev.siniestros[[i]] <- read.csv(paste("C:/Users/...", i+2014," Terremoto Bases SIN.csv", sep = ""), stringsAsFactors = FALSE)
+  #id.year.emision[i] <- paste("year.emision", i+2014, sep = "")
+} 
+```
+
+### Visualizamos un año
+Recordemos que: 1 es 2015 y 2 es 2016
+```{r}
+tev.siniestros[2]
+```
+
+### Obtenemos los nombres de las variables
+```{r}
+names(tev.siniestros[[2]])
+names(tev.siniestros[[1]])
+```
+
+Concluimos que 2015 y 2016 **tienen los mismos atributos**, podemos unir los data frames
+
+### Unimos (verticalmente) los dataframes para los años 2015 y 2016
+```{r}
+tev.siniestros.hist <- rbind(tev.siniestros[[2]], tev.siniestros[[1]])
+
+head(tev.siniestros.hist)   # Visualizamos primeros registros
+
+tail(tev.siniestros.hist)   # Visualizamos últimos registros
+
+```
+
+Podemos confirmar mediante la visualización que la unión de las tablas fue correcta
+
+### Revisamos las variables del dataframe resultante de la unión
+```{r}
+str(tev.siniestros.hist)
+```
+
+### Revisamos atributos
+```{r}
+str(tev.siniestros.hist)
+
+head(tev.siniestros.hist)
+
+tail(tev.siniestros.hist)
+```
+
+### Visualizamos Emisión y Suma Asegurada
+```{r}
+names(tev.emision.hist)
+names(tev.suma.asegurada.hist)
+
+nrow(tev.emision.hist)
+nrow(tev.suma.asegurada.hist)
+
+```
+
+- Emisión tiene 210,211 registros
+- Suma Asegurada tiene 328,215 registros
+
+
+### Exportamos a Excel los data frames de EM y SA
+```{r}
+write.csv(tev.emision.hist, file = "./EM_HIST.csv")
+write.csv(tev.suma.asegurada.hist, file = "./SA_HIST.csv")
+write.csv(tev.siniestros.hist, file = "./SIN_HIST.csv")
+```
+
+### Quitamos tíldes de las variables
+```{r}
+names(tev.emision.hist)[names(tev.emision.hist) == "ZONA.SÍSMICA"] <- "ZONA.SISMICA"
+
+names(tev.siniestros.hist)[names(tev.siniestros.hist) == "ZONA.SÍSMICA"] <- "ZONA.SISMICA"
+
+```
+
+
+
+### Visualizamos Valores dentro de las variables para merge
+```{r}
+em.moneda <- unique(tev.emision.hist$MONEDA)
+em.forma.venta <- unique(tev.emision.hist$FORMA.DE.VENTA)
+#em.giro <- unique(tev.emision.hist$GIRO)
+em.entidad <- unique(tev.emision.hist$ENTIDAD)
+em.zona <- unique(tev.emision.hist$ZONA.SISMICA)
+em.tipo.cartera <- unique(tev.emision.hist$TIPO.DE.CARTERA)
+em.tipo.aseg <- unique(tev.emision.hist$TIPO.DE.ASEGURAMIENTO)
+#em.tipo.seguro <- unique(diversos.suma.asegurada.hist$TIPO.DE.SEGURO)
+em.subtipo.seguro <- unique(tev.emision.hist$SUBTIPO.DE.SEGURO)
+em.industrial <- unique(tev.emision.hist$INDUSTRIAL)
+em.tipo.primer.riesgo <- unique(tev.emision.hist$TIPO.PRIMER.RIESGO)
+
+sa.moneda <- unique(tev.suma.asegurada.hist$MONEDA)
+sa.forma.venta <- unique(tev.suma.asegurada.hist$FORMA.DE.VENTA)
+#em.giro <- unique(tev.emision.hist$GIRO)
+sa.entidad <- unique(tev.suma.asegurada.hist$ENTIDAD)
+sa.zona <- unique(tev.suma.asegurada.hist$ZONA)
+sa.tipo.cartera <- unique(tev.suma.asegurada.hist$TIPO.DE.CARTERA)
+sa.tipo.aseg <- unique(tev.suma.asegurada.hist$TIPO.DE.ASEGURAMIENTO)
+#em.tipo.seguro <- unique(diversos.suma.asegurada.hist$TIPO.DE.SEGURO)
+sa.subtipo.seguro <- unique(tev.suma.asegurada.hist$SUBTIPO.DE.SEGURO)
+sa.industrial <- unique(tev.suma.asegurada.hist$INDUSTRIAL)
+sa.tipo.primer.riesgo <- unique(tev.suma.asegurada.hist$TIPO.PRIMER.RIESGO)
+sa.tipo.bien <- unique(tev.suma.asegurada.hist$TIPO.DE.BIEN)
+sa.cobertura <- unique(tev.suma.asegurada.hist$COBERTURA)
+
+
+
+sin.moneda <- unique(tev.siniestros.hist$MONEDA)
+sin.forma.venta <- unique(tev.siniestros.hist$FORMA.DE.VENTA)
+sin.entidad <- unique(tev.siniestros.hist$ENTIDAD)
+#sin.tipo.seguro <- unique(diversos.siniestros.hist$TIPO.DE.SEGURO)
+sin.zona <- unique(tev.siniestros.hist$ZONA.SISMICA)
+sin.tipo.cartera <- unique(tev.siniestros.hist$TIPO.DE.CARTERA)
+sin.tipo.aseg <- unique(tev.siniestros.hist$TIPO.DE.ASEGURAMIENTO)
+sin.subtipo.seguro <- unique(tev.siniestros.hist$SUBTIPO.DE.SEGURO)
+sin.industrial <- unique(tev.siniestros.hist$INDUSTRIAL)
+sin.tipo.primer.riesgo <- unique(tev.siniestros.hist$TIPO.PRIMER.RIESGO)
+sin.tipo.bien <- unique(tev.siniestros.hist$TIPO.DE.BIEN)
+sin.cobertura <- unique(tev.siniestros.hist$COBERTURA)
+
+
+```
+
+### Reemplazamos valores en las key variables
+```{r}
+tev.emision.hist$FORMA.DE.VENTA[tev.emision.hist$FORMA.DE.VENTA == "Fuerza Venta Interna o Matriz"] <- "Fuerza de Venta Interna o Casa Matriz"
+
+tev.suma.asegurada.hist$FORMA.DE.VENTA[tev.suma.asegurada.hist$FORMA.DE.VENTA == "Fuerza Venta Interna o Matriz"] <- "Fuerza de Venta Interna o Casa Matriz"
+
+tev.siniestros.hist$FORMA.DE.VENTA[tev.siniestros.hist$FORMA.DE.VENTA == "Fuerza Venta Interna o Matriz"] <- "Fuerza de Venta Interna o Casa Matriz"
+
+
+# Variable ENTIDAD de Suma Asegurada
+tev.suma.asegurada.hist$ENTIDAD[tev.suma.asegurada.hist$ENTIDAD == "EN EL EXTRANJERO"] <- "Extranjero"
+
+tev.suma.asegurada.hist$ENTIDAD[tev.suma.asegurada.hist$ENTIDAD == "MEXICO"] <- "Estado de México"
+
+tev.suma.asegurada.hist$ENTIDAD[tev.suma.asegurada.hist$ENTIDAD == "MICHOACAN"] <- "Michoacán"
+
+tev.suma.asegurada.hist$ENTIDAD[tev.suma.asegurada.hist$ENTIDAD == "NUEVO LEON"] <- "Nuevo León"
+
+tev.suma.asegurada.hist$ENTIDAD[tev.suma.asegurada.hist$ENTIDAD == "QUERETARO"] <- "Querétaro"
+
+tev.suma.asegurada.hist$ENTIDAD[tev.suma.asegurada.hist$ENTIDAD == "SAN LUIS POTOSI"] <- "San Luis Potosí"
+
+tev.suma.asegurada.hist$ENTIDAD[tev.suma.asegurada.hist$ENTIDAD == "YUCATAN"] <- "Yucatán"
+
+# Variable ENTIDAD de Siniestros
+tev.siniestros.hist$ENTIDAD[tev.siniestros.hist$ENTIDAD == "EN EL EXTRANJERO"] <- "Extranjero"
+
+tev.siniestros.hist$ENTIDAD[tev.siniestros.hist$ENTIDAD == "MEXICO"] <- "Estado de México"
+
+tev.siniestros.hist$ENTIDAD[tev.siniestros.hist$ENTIDAD == "MICHOACAN"] <- "Michoacán"
+
+tev.siniestros.hist$ENTIDAD[tev.siniestros.hist$ENTIDAD == "NUEVO LEON"] <- "Nuevo León"
+
+tev.siniestros.hist$ENTIDAD[tev.siniestros.hist$ENTIDAD == "QUERETARO"] <- "Querétaro"
+
+tev.siniestros.hist$ENTIDAD[tev.siniestros.hist$ENTIDAD == "SAN LUIS POTOSI"] <- "San Luis Potosí"
+
+tev.siniestros.hist$ENTIDAD[tev.siniestros.hist$ENTIDAD == "YUCATAN"] <- "Yucatán"
+
+# Variable de ENTIDAD en Emisión
+tev.emision.hist$ENTIDAD[tev.emision.hist$ENTIDAD == "EN EL EXTRANJERO"] <- "Extranjero"
+
+tev.emision.hist$ENTIDAD[tev.emision.hist$ENTIDAD == "MEXICO"] <- "Estado de México"
+
+tev.emision.hist$ENTIDAD[tev.emision.hist$ENTIDAD == "MICHOACAN"] <- "Michoacán"
+
+tev.emision.hist$ENTIDAD[tev.emision.hist$ENTIDAD == "NUEVO LEON"] <- "Nuevo León"
+
+tev.emision.hist$ENTIDAD[tev.emision.hist$ENTIDAD == "QUERETARO"] <- "Querétaro"
+
+tev.emision.hist$ENTIDAD[tev.emision.hist$ENTIDAD == "SAN LUIS POTOSI"] <- "San Luis Potosí"
+
+tev.emision.hist$ENTIDAD[tev.emision.hist$ENTIDAD == "YUCATAN"] <- "Yucatán"
+
+# Variable INDUSTRIAL en Emisión
+tev.emision.hist$INDUSTRIAL[tev.emision.hist$INDUSTRIAL == "Sí"] <- "Si"
+
+# Variable TIPO DE BIEN en Suma Asegurada
+tev.suma.asegurada.hist$TIPO.DE.BIEN[tev.suma.asegurada.hist$TIPO.DE.BIEN == "Edificio y Pérdidas Consecuenc"] <- "Edificio y Pérdidas Consecuenciales"
+
+tev.suma.asegurada.hist$TIPO.DE.BIEN[tev.suma.asegurada.hist$TIPO.DE.BIEN == "Existencias / Bienes Bajo Conv"] <- "Existencias / Bienes Bajo Convenio Expreso"
+
+tev.suma.asegurada.hist$TIPO.DE.BIEN[tev.suma.asegurada.hist$TIPO.DE.BIEN == "Perdidas Consecuenciales"] <- "Pérdidas Consecuenciales"
+
+
+# Variable TIPO DE BIEN en Siniestros
+tev.siniestros.hist$TIPO.DE.BIEN[tev.siniestros.hist$TIPO.DE.BIEN == "Edificio y Pérdidas Consecuenc"] <- "Edificio y Pérdidas Consecuenciales"
+
+tev.siniestros.hist$TIPO.DE.BIEN[tev.siniestros.hist$TIPO.DE.BIEN == "Existencias / Bienes Bajo Conv"] <- "Existencias / Bienes Bajo Convenio Expreso"
+
+tev.siniestros.hist$TIPO.DE.BIEN[tev.siniestros.hist$TIPO.DE.BIEN == "Perdidas Consecuenciales"] <- "Pérdidas Consecuenciales"
+
+# Variable COBERTURA para Suma Asegurada
+tev.suma.asegurada.hist$COBERTURA[tev.suma.asegurada.hist$COBERTURA == "Gastos Extraodinarios"] <- "Gastos Extraordinarios"
+
+# Variable COBERTURA para Emisión
+tev.siniestros.hist$COBERTURA[tev.siniestros.hist$COBERTURA == "Gastos Extraodinarios"] <- "Gastos Extraordinarios"
+
+```
+
+### Exportamos tablas para agrupar en Access
+```{r}
+head(tev.emision.hist)
+head(tev.suma.asegurada.hist)
+head(tev.siniestros.hist)
+
+write.csv(tev.emision.hist, file = "./EM_HIST_ACCESS.csv")
+write.csv(tev.suma.asegurada.hist, file = "./SA_HIST_ACCESS.csv")
+write.csv(tev.siniestros.hist, file = "./SIN_HIST_ACCESS.csv")
+```
+
+### Importamos tablas agrupadas para asignar claves
+```{r}
+tev.emision.hist.group <- read.csv("C:/Users/PC/Desktop/Swiss Re/Bases CNSF/Terremoto/CSV Terremoto/EM_HIST_GROUP.csv")
+
+tev.sa.hist.group <- read.csv("C:/Users/PC/Desktop/Swiss Re/Bases CNSF/Terremoto/CSV Terremoto/SA_HIST_GROUP.csv")
+
+tev.siniestros.hist.group <- read.csv("C:/Users/PC/Desktop/Swiss Re/Bases CNSF/Terremoto/CSV Terremoto/SIN_HIST_GROUP.csv")
+
+```
+
+### Importamos tablas de variables para VLOOKUP
+```{r}
+tev.moneda <- read.csv("C:/Users/...Moneda.csv")
+
+tev.forma.venta <- read.csv("C:/Users/.../Forma de Venta.csv")
+
+tev.entidad <- read.csv("C:/Users/.../Entidad.csv")
+  
+tev.zona <- read.csv("C:/Users/.../Zona.csv")
+  
+tev.tipo.cartera <- read.csv("C:/Users/PC/Desktop/Swiss Re/Bases CNSF/Terremoto/CSV Terremoto/Tipo de Cartera.csv")
+
+tev.tipo.aseg <- read.csv("C:/Users/PC/Desktop/Swiss Re/Bases CNSF/Terremoto/CSV Terremoto/Tipo de Aseguramiento.csv")
+
+tev.subtipo <- read.csv("C:/Users/PC/Desktop/Swiss Re/Bases CNSF/Terremoto/CSV Terremoto/Subtipo.csv")
+  
+tev.industrial <- read.csv("C:/Users/PC/Desktop/Swiss Re/Bases CNSF/Terremoto/CSV Terremoto/Industrial.csv")
+  
+tev.tpr <- read.csv("C:/Users/PC/Desktop/Swiss Re/Bases CNSF/Terremoto/CSV Terremoto/Tipo Primer Riesgo.csv")
+  
+tev.tipo.bien <- read.csv("C:/Users/PC/Desktop/Swiss Re/Bases CNSF/Terremoto/CSV Terremoto/Tipo de Bien.csv")
+
+tev.cobertura <- read.csv("C:/Users/PC/Desktop/Swiss Re/Bases CNSF/Terremoto/CSV Terremoto/Cobertura.csv")
+  
+  
+```
+
+
+### Visualizamos estructura de tablas de variables
+```{r}
+head(tev.moneda)
+head(tev.forma.venta)
+head(tev.entidad)
+head(tev.zona)
+head(tev.tipo.cartera)
+head(tev.tipo.aseg)
+head(tev.subtipo)
+head(tev.industrial)
+head(tev.tpr)
+head(tev.tipo.bien)
+head(tev.cobertura)
+```
+
+### En Emisión y Siniestros, cambiamos nombre de la variable ZONA
+```{r}
+names(tev.emision.hist.group)[which(names(tev.emision.hist.group) == "ZONASISMICA")] <- "ZONA"
+
+names(tev.siniestros.hist.group)[which(names(tev.siniestros.hist.group) == "ZONASISMICA")] <- "ZONA"
+```
+
+
+### Proceso de VLOOKUP de claves para Emisión
+```{r}
+em.clave.moneda <- merge(tev.emision.hist.group, tev.moneda[, c("MONEDA", "Clave.Moneda")])
+
+em.clave.forma <- merge(em.clave.moneda, tev.forma.venta[, c("FORMADEVENTA", "Clave.Forma.Venta")])
+
+em.clave.entidad <- merge(em.clave.forma, tev.entidad[, c("ENTIDAD", "Clave.Entidad")])
+
+em.clave.zona <- merge(em.clave.entidad, tev.zona[, c("ZONA", "Clave.Zona")])
+
+em.clave.tipo.cartera <- merge(em.clave.zona, tev.tipo.cartera[, c("TIPODECARTERA", "Clave.Tipo.Cartera")])
+
+em.clave.tipo.aseg <- merge(em.clave.tipo.cartera, tev.tipo.aseg[, c("TIPODEASEGURAMIENTO", "Clave.Tipo.Aseguramiento")])
+
+em.clave.subtipo <- merge(em.clave.tipo.aseg, tev.subtipo[, c("SUBTIPODESEGURO", "Clave.Subtipo")])
+
+em.clave.industrial <- merge(em.clave.subtipo, tev.industrial[, c("INDUSTRIAL", "Clave.Industrial")])
+
+em.clave.tpr <- merge(em.clave.industrial, tev.tpr[, c("TIPOPRIMERRIESGO", "Clave.Tipo.Primer.Riesgo")])
+
+em.clave <- em.clave.tpr
+
+head(em.clave)
+
+```
+
+### Concatenamos las llaves 
+```{r}
+em.clave$KEY.SA <- paste(em.clave$YEAR, em.clave$Clave.Moneda, em.clave$Clave.Forma.Venta, em.clave$Clave.Entidad, em.clave$Clave.Zona, em.clave$Clave.Tipo.Cartera, em.clave$Clave.Tipo.Aseguramiento, em.clave$Clave.Subtipo, em.clave$Clave.Industrial, em.clave$Clave.Tipo.Primer.Riesgo)
+
+em.key.sa <- em.clave
+
+head(em.key.sa)
+```
+
+### Exportamos la Emisión con Claves
+```{r}
+write.csv(em.key.sa, file = "./EM KEY.csv")
+```
+
+### Proceso de VLOOKUP de claves para Suma Asegurada
+```{r}
+sa.clave.moneda <- merge(tev.sa.hist.group, tev.moneda[, c("MONEDA", "Clave.Moneda")])
+
+sa.clave.forma <- merge(sa.clave.moneda, tev.forma.venta[, c("FORMADEVENTA", "Clave.Forma.Venta")])
+
+sa.clave.entidad <- merge(sa.clave.forma, tev.entidad[, c("ENTIDAD", "Clave.Entidad")])
+
+sa.clave.zona <- merge(sa.clave.entidad, tev.zona[, c("ZONA", "Clave.Zona")])
+
+sa.clave.tipo.cartera <- merge(sa.clave.zona, tev.tipo.cartera[, c("TIPODECARTERA", "Clave.Tipo.Cartera")])
+
+sa.clave.tipo.aseg <- merge(sa.clave.tipo.cartera, tev.tipo.aseg[, c("TIPODEASEGURAMIENTO", "Clave.Tipo.Aseguramiento")])
+
+sa.clave.subtipo <- merge(sa.clave.tipo.aseg, tev.subtipo[, c("SUBTIPODESEGURO", "Clave.Subtipo")])
+
+sa.clave.industrial <- merge(sa.clave.subtipo, tev.industrial[, c("INDUSTRIAL", "Clave.Industrial")])
+
+sa.clave.tpr <- merge(sa.clave.industrial, tev.tpr[, c("TIPOPRIMERRIESGO", "Clave.Tipo.Primer.Riesgo")])
+
+sa.clave.tipo.bien <- merge(sa.clave.tpr, tev.tipo.bien[, c("TIPODEBIEN", "Clave.Tipo.Bien")])
+
+sa.clave.cobertura <- merge(sa.clave.tipo.bien, tev.cobertura[, c("COBERTURA", "Clave.Cobertura")])
+
+sa.clave <- sa.clave.cobertura
+
+head(sa.clave)
+
+```
+
+
+### Concatenamos las llaves 
+```{r}
+sa.clave$KEY.SA <- paste(sa.clave$YEAR, sa.clave$Clave.Moneda, sa.clave$Clave.Forma.Venta, sa.clave$Clave.Entidad, sa.clave$Clave.Zona, sa.clave$Clave.Tipo.Cartera, sa.clave$Clave.Tipo.Aseguramiento, sa.clave$Clave.Subtipo, sa.clave$Clave.Industrial, sa.clave$Clave.Tipo.Primer.Riesgo)
+
+sa.key.em <- sa.clave
+
+head(sa.key.em)
+```
+
+### Exportamos la Suma Asegurada con Claves
+```{r}
+write.csv(sa.key.em, file = "./SA KEY EM.csv")
+```
+
+### Proceso de VLOOKUP de claves para Siniestros
+```{r}
+sin.clave.moneda <- merge(tev.siniestros.hist.group, tev.moneda[, c("MONEDA", "Clave.Moneda")])
+
+sin.clave.forma <- merge(sin.clave.moneda, tev.forma.venta[, c("FORMADEVENTA", "Clave.Forma.Venta")])
+
+sin.clave.entidad <- merge(sin.clave.forma, tev.entidad[, c("ENTIDAD", "Clave.Entidad")])
+
+sin.clave.zona <- merge(sin.clave.entidad, tev.zona[, c("ZONA", "Clave.Zona")])
+
+sin.clave.tipo.cartera <- merge(sin.clave.zona, tev.tipo.cartera[, c("TIPODECARTERA", "Clave.Tipo.Cartera")])
+
+sin.clave.tipo.aseg <- merge(sin.clave.tipo.cartera, tev.tipo.aseg[, c("TIPODEASEGURAMIENTO", "Clave.Tipo.Aseguramiento")])
+
+sin.clave.subtipo <- merge(sin.clave.tipo.aseg, tev.subtipo[, c("SUBTIPODESEGURO", "Clave.Subtipo")])
+
+sin.clave.industrial <- merge(sin.clave.subtipo, tev.industrial[, c("INDUSTRIAL", "Clave.Industrial")])
+
+sin.clave.tpr <- merge(sin.clave.industrial, tev.tpr[, c("TIPOPRIMERRIESGO", "Clave.Tipo.Primer.Riesgo")])
+
+sin.clave.tipo.bien <- merge(sin.clave.tpr, tev.tipo.bien[, c("TIPODEBIEN", "Clave.Tipo.Bien")])
+
+sin.clave.cobertura <- merge(sin.clave.tipo.bien, tev.cobertura[, c("COBERTURA", "Clave.Cobertura")])
+
+sin.clave <- sin.clave.cobertura
+
+head(sin.clave)
+
+```
+
+### Concatenamos las llaves 
+```{r}
+sin.clave$KEY.SA <- paste(sin.clave$YEAR, sin.clave$Clave.Moneda, sin.clave$Clave.Forma.Venta, sin.clave$Clave.Entidad, sin.clave$Clave.Zona, sin.clave$Clave.Tipo.Cartera, sin.clave$Clave.Tipo.Aseguramiento, sin.clave$Clave.Subtipo, sin.clave$Clave.Industrial, sin.clave$Clave.Tipo.Primer.Riesgo)
+
+sin.key.em <- sin.clave
+
+head(sin.key.em)
+```
+
+### Exportamos la Suma Asegurada con Claves
+```{r}
+write.csv(sin.key.em, file = "./SIN KEY EM.csv")
+```
+
+### Importamos EM + SIN con filtro de TPR = Ninguno
+```{r}
+tev.em.sin.tpr.filter <- read.csv("C:/Users/PC/Desktop/Swiss Re/Bases CNSF/Terremoto/CSV Terremoto/EM_SIN_TPR_NINGUNO.csv")
+
+head(tev.em.sin.tpr.filter)
+```
+
+### Análisis Exploratorio de LMR.PROM
+```{r}
+options(scipen=100)
+options(digits=2)
+
+stat.desc(tev.em.sin.tpr.filter$LMR.PROMEDIO)
+quantile(tev.em.sin.tpr.filter$LMR.PROMEDIO, prob = c(.65, .75, .8, .9))
+
+```
+
+### Tomemos un corte a 2,546,721 en LMR.PROM
+```{r}
+tev.em.sin.lmr.filter <- tev.em.sin.tpr.filter[which(tev.em.sin.tpr.filter$LMR.PROMEDIO > 2546721), ]
+
+stat.desc(tev.em.sin.lmr.filter$LMR.PROMEDIO)
+quantile(tev.em.sin.lmr.filter$LMR.PROMEDIO, prob = c(.65, .75, .8, .9))
+
+```
+
+```{r}
+nrow(tev.em.sin.lmr.filter)
+```
+
+### Filtramos para Prima Emitida > 0
+```{r}
+head(tev.em.sin.lmr.filter)
+
+stat.desc(tev.em.sin.lmr.filter$PRIM_EMI)
+
+tev.em.sin.prim.filter <- tev.em.sin.lmr.filter[which(tev.em.sin.lmr.filter$PRIM_EMI > 0), ]
+
+nrow(tev.em.sin.prim.filter)
+
+
+```
+
+### Exportamos data frame resultante
+```{r}
+write.csv(tev.em.sin.prim.filter, file = "C:/Users/PC/Desktop/Swiss Re/Bases CNSF/Terremoto/CSV Terremoto/EM_SIN_ALL_FILTERS.csv")
+```
+
+### Importamos data frame con Prima Emitida Promedio
+```{r}
+tev.em.sin.prim.emi.prom <- read.csv("C:/Users/S8C9V6/Desktop/Bases CNSF/Terremoto/CSV Terremoto/EM_SIN_PRIM_EMI_PROM.csv")
+
+head(tev.em.sin.prim.emi.prom)
+```
+
+
+
+
+### Construimos Vector para muestreo
+```{r}
+tev.muestreo <- data.frame(num = numeric(722808), NUM_UBI = numeric(722808), NUM_UBI_ACUM = numeric(722808), RANGO = numeric(722808), PRIM_EMI_PROM = numeric(722808))
+
+head(tev.muestreo)
+
+```
+
+### Asignamos valores consecutivos al nuevo data frame
+```{r}
+tev.muestreo$num <- seq(1, 722808, 1)
+
+head(tev.muestreo)
+tail(tev.muestreo)
+```
+
+### Tomamos (50) diferentes muestras de tamaño 1,000 (pues es el número cercano a dividir el target entre el promedio de PRIM_EMI_PROM)
+```{r}
+muestras.consec <- NULL
+
+for (i in 1:50){
+  muestras.consec[[i]] <- sample_n(tev.muestreo, 17000, replace = FALSE)
+  }
+
+head(muestras.consec[1])
+head(muestras.consec[2])
+head(muestras.consec[3])
+```
+
+### Damos formato de data frame a las muestras
+```{r}
+#for (i in 2:50){
+ # muestra & i <- data.frame(muestras.consec[i])
+#}
+```
+
+
+
+### Importamos archivo de Rangos
+```{r}
+em.rangos <- read.csv("C:/Users/S8C9V6/Desktop/Bases CNSF/Terremoto/CSV Terremoto/EM_RANGOS.csv")
+
+head(em.rangos)
+tail(em.rangos)
+```
+
+```{r}
+muestra.1 <- data.frame(muestras.consec[1])
+
+head(muestra.1)
+
+
+```
+
+```{r}
+muestra.1$num[1]
+```
+
+
+### Definimos rangos en las muestras
+```{r}
+for (i in 1:nrow(muestra.1)){
+  for (j in 2:226){
+    if (muestra.1$num[i] <= em.rangos$NUM_UBI_ACUM[j] & muestra.1$num[i] > em.rangos$NUM_UBI_ACUM[j-1]){
+      muestra.1$RANGO[i] = j
+    }
+  }
+}
+
+head(muestra.1)
+```
+
+
+```{r}
+#for (i in 2:226){
+  #muestra.1 %>%
+  #mutate(RANGO = case_when(
+    #num <= em.rangos$NUM_UBI_ACUM[1] ~ 1,
+    #num > em.rangos$NUM_UBI_ACUM[1] & num <= em.rangos$NUM_UBI_ACUM[i] ~ i,
+    #TRUE ~ 0
+    #)
+  #)  
+  
+#}
+#muestra.1 %>%
+  #mutate(RANGO = case_when(
+    #num <= em.rangos$NUM_UBI_ACUM[1] ~ 1
+    #num > em.rangos$NUM_UBI_ACUM[1] & num <= em.rangos$NUM_UBI_ACUM[2] ~ 2
+    
+    #)
+  #)  
+
+#head(muestra.1)
+```
+
+
+
+```{r}
+muestra.1
+```
+
+### Exportamos la muestra con rangos
+```{r}
+write.csv(muestra.1, file = "C:/Users/S8C9V6/Desktop/Bases CNSF/Terremoto/CSV Terremoto/Muestra 1 Rangos.csv")
+```
+
+
+
+
+
