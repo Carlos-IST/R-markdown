@@ -1,0 +1,770 @@
+---
+title: "EstadÃ­stica Aplicada I: Proyecto"
+author: "Carlos SantillÃ¡n, Erick Zarza, Omar FernÃ¡ndez"
+date: "13 de marzo de 2016"
+output: html_document
+---
+
+### Nombramos nuestro directorio de trabajo:
+```{r Directorio, echo= FALSE}
+
+directorio <- "C:/Users/Klos/Desktop/PROYECTO"
+
+setwd(directorio)     # asignamos directorio
+
+```
+
+### Verificamos la asignaciÃ³n del directorio:
+```{r}
+getwd()    # verificamos el directorio asignado
+```
+
+### InstalaciÃ³n de paquetes
+```{r InstalaciÃ³n y Carga de Paquetes, echo = FALSE}
+
+knitr::opts_knit$set(root.dir = directorio)
+
+# Paquetes que se ocuparan
+paquetes.utilizados <- c("plyr","editrules", "lubridate", "ggplot2","reshape2", "tidyr", "xtable", "knitr", "dplyr", "lubridate","ggthemes","reshape")
+paquetes.instalados <- rownames(installed.packages())
+paquetes.por.instalar <- setdiff(paquetes.utilizados, paquetes.instalados)
+
+if (length(paquetes.por.instalar) != 0 ) install.packages(paquetes.por.instalar, 
+                                                         repos = "http://cran.us.r-project.org")
+lapply(paquetes.utilizados, library, character.only = TRUE)
+
+```
+
+## Lectura de datos
+Lectura de datos por FUENTE.
+El contador "i" se asigna para poder seguir la numeraciÃ³n natural
+```{r Lectura de Datos Fuente, echo = FALSE}
+
+# Se leen los datos de los archivos   (FUENTE DE NOTIFICACIÃN) 
+
+fuente <- NULL      # InicializaciÃ³n de variables
+id.fuente <- NULL
+
+# Caso femenino
+for (i in 1:12){
+  fuente[[i]] <- read.csv(paste("./DATOS/BRUTOS/FUENTE/fuente_f_", i+2002, ".csv", sep = ""), stringsAsFactors = FALSE)
+  id.fuente[i] <- paste("fuente_f_", i+2002, sep = "")
+} 
+
+# Caso masculino
+for (i in 13:24){
+  fuente[[i]] <- read.csv(paste("./DATOS/BRUTOS/FUENTE/fuente_m_", i+1990, ".csv",sep = ""), stringsAsFactors = FALSE)
+  id.fuente[i] <- paste("fuente_m_", i+1990, sep = "")
+}
+
+# Caso General
+for (i in 25:36){
+  fuente[[i]] <- read.csv(paste("./DATOS/BRUTOS/FUENTE/fuente_g_", i+1978, ".csv", sep = ""), stringsAsFactors = FALSE)
+  id.fuente[i] <- paste("fuente_g_", i+1978, sep = "")
+}
+
+```
+
+Nombre de las variables a mayÃºsculas
+```{r Cambio variable mayusculas, echo = FALSE}
+
+# Se cambia el nombre de las variables a mayÃºsculas
+
+for (i in 1:36){
+  names(fuente[[i]]) <- toupper(names(fuente[[i]]))}
+
+for (i in 1:36){names(fuente[[i]]) <- replace(names(fuente[[i]]),names(fuente[[i]])=="SALUD"|names(fuente[[i]])=="SSA","SSA")}
+
+for (i in 1:36){names(fuente[[i]]) <- replace(names(fuente[[i]]),names(fuente[[i]])=="SEMAR"|names(fuente[[i]])=="SEDEMAR","SEDEMAR")}
+
+#for (i in 1:36){
+ # fuente[[i]]$ESTADO_RECODE <- NA
+#}
+
+```
+
+Los nombres de los estados tienen bastantes errores, particularmente en el caso de las tildes. Consideramos como una mejor opciÃ³n redefinir el vector "ESTADO":
+```{r Cambio Nombres Estados, echo = FALSE}
+
+# Se cambia el nombre de los estados con la ortografÃ­a correcta
+
+EDO <- c("Aguascalientes" ,"Baja California Norte","Baja California Sur" ,"Campeche" ,"Coahuila" ,"Colima" ,"Chiapas" ,"Chihuahua" ,"Distrito Federal" ,"Durango" ,"Guanajuato" ,"Guerrero" ,"Hidalgo" ,"Jalisco" ,"MÃ©xico" ,"MichoacÃ¡n" ,"Morelos" ,"Nayarit" ,"Nuevo LeÃ³n" ,"Oaxaca" ,"Puebla" ,"QuerÃ©taro" ,"Quintana Roo" ,"San Luis Potosi" ,"Sinaloa" ,"Sonora" ,"Tabasco" ,"Tamaulipas" ,"Tlaxcala" ,"Veracruz" ,"YucatÃ¡n" ,"Zacatecas" ,"TOTAL")
+
+for (i in 1:36){fuente[[i]]$ESTADO <- c(EDO)}   # redefiniciÃ³n de la variable ESTADO
+
+```
+
+Formalizamos nuestros datos de FUENTE en un Data Frame, se aÃ±ade una variable auxiliar "id.fuente":
+```{r ConstrucciÃ³n Data Frame, echo = FALSE}
+
+names(fuente) <- id.fuente # se agrega la columna id 
+
+violencia.fuente <- ldply(fuente,data.frame)
+
+```
+
+Lectura de datos por Grupo de Edad
+```{r Lectura Datos Edad, echo = FALSE}
+
+# Se leen los datos de los archivos   (GRUPO DE EDAD) 
+
+grupo <- NULL       # inicializaciÃ³n de variables
+id.grupo <- NULL
+
+# Caso femenimo
+for (i in 1:12){
+  grupo[[i]] <- read.csv(paste("./DATOS/BRUTOS/GRUPO/grupo_f_", i+2002, ".csv", sep = ""), stringsAsFactors = FALSE) 
+  id.grupo[i] <- paste("grupo_f_", i+2002, sep = "") 
+}
+
+# Caso masculino 
+for (i in 13:24){
+  grupo[[i]] <- read.csv(paste("./DATOS/BRUTOS/GRUPO/grupo_m_", i+1990, ".csv", sep = ""), stringsAsFactors = FALSE)
+  id.grupo[i] <- paste("grupo_m_", i+1990, sep = "")
+}
+
+# Caso general
+for (i in 25:36){
+  grupo[[i]] <- read.csv(paste("./DATOS/BRUTOS/GRUPO/grupo_g_", i+1978, ".csv", sep = ""), stringsAsFactors = FALSE)
+  id.grupo[i] <- paste("grupo_g_", i+1978, sep="")
+}
+
+```
+
+Cambio de variables a mayÃºsculas y conversiÃ³n a Data Frame
+```{r Cambio Variables MayÃºsculas, echo = FALSE}
+
+# Se cambia el nombre de las variables a mayusculas
+
+for (i in 1:36){
+  names(grupo[[i]]) <- toupper(names(grupo[[i]]))}
+
+for (i in 1:36){
+  names(grupo[[i]]) <- replace(names(grupo[[i]]),names(grupo[[i]])=="IGN.","EDAD.DESC")}
+
+for (i in 1:36){
+  grupo[[i]]$ESTADO <- c(EDO)}
+
+names(grupo) <- id.grupo                    # aÃ±adimos variable id
+violencia.grupo <- ldply(grupo,data.frame)  # conversiÃ³n a data frame
+
+```
+
+Lectura de Datos Mes
+```{r Lectura Datos Mes, echo = FALSE}
+
+# Se leen los datos de los archivos de  (MES DE OBSERVACIÃN) 
+
+mes <- NULL      # InicializaciÃ³n de variables
+id.mes <- NULL
+
+# Caso femenino
+for (i in 1:12){
+  mes[[i]] <- read.csv(paste("./DATOS/BRUTOS/MES/mes_f_", i+2002, ".csv", sep = ""), stringsAsFactors = FALSE)
+  id.mes[i] <- paste("mes_f_", i+2002, sep = "")
+}
+
+# Caso masculino
+for (i in 13:24){
+  mes[[i]] <- read.csv(paste("./DATOS/BRUTOS/MES/mes_m_", i+1990, ".csv", sep = ""), stringsAsFactors = FALSE)
+  id.mes[i] <- paste("mes_m_", i+1990, sep = "")
+}
+
+# Caso general
+for (i in 25:36){
+  mes[[i]] <- read.csv(paste("./DATOS/BRUTOS/MES/mes_g_", i+1978, ".csv", sep=""), stringsAsFactors=FALSE)
+  id.mes[i] <- paste("mes_g_", i+1978, sep="")
+}
+
+```
+
+Cambio de variables a mayÃºsculas y construcciÃ³n del Data Set
+```{r Cambio variables, echo = FALSE}
+# Se cambia el nombre de las variables a mayÃºsculas
+
+for (i in 1:36){
+  names(mes[[i]]) <- toupper(names(mes[[i]]))}
+
+for (i in 1:36){names(mes[[i]]) <- replace(names(mes[[i]]),names(mes[[i]])=="TASA."|names(mes[[i]])=="INCIDENCIA","TASA")}
+
+#Se cambia el nombre de los estados con la ortografÃ­a correcta
+
+for (i in 1:36){mes[[i]]$ESTADO <- c(EDO)}
+
+
+names(mes) <- id.mes                     # aÃ±adimos variable id
+violencia.mes <- ldply(mes,data.frame)   #
+
+# Sin embargo, en la variable ".id" hay valores con el formato "mes_f_.yyyy", los cuales entorpecen el proceso
+
+violencia.mes2 <- subset(violencia.mes, violencia.mes$.id == "mes_m_.2003" | violencia.mes$.id == "mes_m_.2004" | violencia.mes$.id == "mes_m_.2005" | violencia.mes$.id == "mes_m_.2006" | violencia.mes$.id == "mes_m_.2007" | violencia.mes$.id == "mes_m_.2008" | violencia.mes$.id == "mes_m_.2009" | violencia.mes$.id == "mes_m_.2010" | violencia.mes$.id == "mes_m_.2011" | violencia.mes$.id == "mes_m_.2012" | violencia.mes$.id == "mes_m_.2013" | violencia.mes$.id == "mes_m_.2014" | violencia.mes$.id == "mes_f_.2003" | violencia.mes$.id == "mes_f_.2004" | violencia.mes$.id == "mes_f_.2005" | violencia.mes$.id == "mes_f_.2006" | violencia.mes$.id == "mes_f_.2007" | violencia.mes$.id == "mes_f_.2008" | violencia.mes$.id == "mes_f_.2009" | violencia.mes$.id == "mes_f_.2010" | violencia.mes$.id == "mes_f_.2011" | violencia.mes$.id == "mes_f_.2012" | violencia.mes$.id == "mes_f_.2013" | violencia.mes$.id == "mes_f_.2014" | violencia.mes$.id == "mes_g_.2003" | violencia.mes$.id == "mes_g_.2004" | violencia.mes$.id == "mes_g_.2005" | violencia.mes$.id == "mes_g_.2006" | violencia.mes$.id == "mes_g_.2007" | violencia.mes$.id == "mes_g_.2008" | violencia.mes$.id == "mes_g_.2009" | violencia.mes$.id == "mes_g_.2010" | violencia.mes$.id == "mes_g_.2011" | violencia.mes$.id == "mes_g_.2012" | violencia.mes$.id == "mes_g_.2013" | violencia.mes$.id == "mes_g_.2014")
+
+```
+
+
+### Anexo de variables: Sexo y AÃ±o datasets de FUENTE, GRUPO y MES
+```{r Variables, echo = FALSE}
+
+#FUENTE
+
+violencia.fuente$YEAR <- factor(substr(violencia.fuente$.id,10,13), ordered=TRUE)
+violencia.fuente$SEXO <- factor(substr(violencia.fuente$.id,8,8))
+violencia.fuente$.id <- NULL
+violencia.fuente$DIF <- NULL
+violencia.fuente$PEMEX <- NULL
+violencia.fuente$IMSS.ORD. <- NULL
+violencia.fuente$IMSS.PROSP..DIF <- NULL
+violencia.fuente$INSTITUCIÃÂ³NDIF <- NULL
+violencia.fuente$X <- NULL
+violencia.fuente$FUENTE.DE.NOTIFICACIÃÂ³NIMSS.OP <- NULL
+violencia.fuente <- within(violencia.fuente,{
+  SEXO <- gsub("m","Masculino",SEXO,fixed=TRUE)
+  SEXO <- gsub("f","Femenino",SEXO,fixed=TRUE)
+  SEXO <- gsub("g","General",SEXO,fixed=TRUE)
+ })
+
+#GRUPO
+
+violencia.grupo$YEAR <- factor(substr(violencia.grupo$.id,9,12), ordered=TRUE)
+violencia.grupo$SEXO <- factor(substr(violencia.grupo$.id,7,7))
+violencia.grupo$.id <- NULL
+violencia.grupo$X01.ABR <- NULL
+violencia.grupo$X05.SEP <- NULL
+violencia.grupo$OCT.14 <- NULL
+violencia.grupo$X20...24..25...44..45...49 <- NULL
+violencia.grupo$X20...24..25...44 <- NULL
+violencia.grupo <- within(violencia.grupo,{
+  SEXO <- gsub("m","Masculino",SEXO,fixed=TRUE)
+  SEXO <- gsub("f","Femenino",SEXO,fixed=TRUE)
+  SEXO <- gsub("g","General",SEXO,fixed=TRUE)
+ })
+
+
+# MES
+
+violencia.mes$YEAR <- factor(substr(violencia.mes$.id,7,10), ordered=TRUE)
+violencia.mes$SEXO <- factor(substr(violencia.mes$.id,5,5))
+violencia.mes$.id <- NULL
+violencia.mes$TASA <- NULL    # eliminada por faltar observaciones
+violencia.mes$INCIDENCIA. <- NULL
+violencia.mes$ENERO <- NULL
+violencia.mes$FEBRERO <- NULL
+violencia.mes$MARZO <- NULL
+violencia.mes$ABRIL <- NULL
+violencia.mes$MAYO <- NULL
+violencia.mes$JUNIO <- NULL
+violencia.mes$JULIO <- NULL
+violencia.mes$AGOSTO <- NULL
+violencia.mes$SEPTIEMBRE <- NULL
+violencia.mes$OCTUBRE <- NULL
+violencia.mes$NOVIEMBRE <- NULL
+violencia.mes$DICIEMBRE <- NULL
+#violencia.mes <- within(violencia.mes,{
+  #sexo <- gsub("m","Masculino",SEXO,fixed=TRUE)
+  #sexo <- gsub("f","Femenino",SEXO,fixed=TRUE)
+  #sexo <- gsub("g","General",SEXO,fixed=TRUE)
+ #})
+
+```
+
+## Cambio de variables a tipo "factor"
+Las variables "SEXO" y "EDO" se cambian a "factor"
+```{r ConversiÃ³n factor, echo = FALSE}
+
+# FUENTE
+
+violencia.fuente$ESTADO <- factor(violencia.fuente$ESTADO)  # vÃ¡lido
+violencia.fuente$SEXO <- factor(violencia.fuente$SEXO)      # vÃ¡lido
+# sapply(violencia.fuente, class)
+
+# GRUPO
+
+violencia.grupo$ESTADO <- factor(violencia.grupo$ESTADO)    # vÃ¡lido
+violencia.grupo$SEXO <- factor(violencia.grupo$SEXO)        # vÃ¡lido
+# sapply(violencia.grupo, class)
+
+# MES
+
+violencia.mes$ESTADO <- factor(violencia.mes$ESTADO)        # vÃ¡lido
+violencia.mes$SEXO <- factor(violencia.mes$SEXO)            # vÃ¡lido
+# sapply(violencia.mes, class)
+```
+
+## EliminaciÃ³n de espacios en observaciones
+```{r EliminaciÃ³n de espacios, echo = FALSE}
+
+# FUENTE
+
+violencia.fuente <- within(violencia.fuente, {
+     SSA <- gsub("[ ]{1,}","",SSA)
+     IMSS.ORD <- gsub("[ ]{1,}","",IMSS.ORD)
+     ISSSTE <- gsub("[ ]{1,}","",ISSSTE)
+     IMSS.OP <- gsub("[ ]{1,}","",IMSS.OP)
+     DIF.PEMEX <- gsub("[ ]{1,}","",DIF.PEMEX)
+     SEDENA <- gsub("[ ]{1,}","",SEDENA)
+     SEDEMAR <- gsub("[ ]{1,}","",SEDEMAR)
+     OTRAS <- gsub("[ ]{1,}","",OTRAS)
+     TOTAL <- gsub("[ ]{1,}","",TOTAL)
+ })      # vÃ¡lido
+
+# GRUPO
+
+violencia.grupo <- within(violencia.grupo,{
+  X..1 <- gsub("[ ]{1,}","",X..1)
+  X1...4 <- gsub("[ ]{1,}","",X1...4)
+  X5...9 <- gsub("[ ]{1,}","",X5...9)
+  X10...14 <- gsub("[ ]{1,}","",X10...14)
+  X15...19 <- gsub("[ ]{1,}","",X15...19)
+  X20...24 <- gsub("[ ]{1,}","",X20...24)
+  X25...44 <- gsub("[ ]{1,}","",X25...44)
+  X45...49 <- gsub("[ ]{1,}","",X45...49)
+  X50...59 <- gsub("[ ]{1,}","",X50...59)
+  X60...64 <- gsub("[ ]{1,}","",X60...64)
+  X65.Y.. <- gsub("[ ]{1,}","",X65.Y..)
+  EDAD.DESC <- gsub("[ ]{1,}","",EDAD.DESC)
+  TOTAL <- gsub("[ ]{1,}","",TOTAL)
+})      # vÃ¡lido
+
+# MES
+
+violencia.mes <- within(violencia.mes, {
+     ENE <- gsub("[ ]{1,}","",ENE)
+     FEB <- gsub("[ ]{1,}","",FEB)
+     MAR <- gsub("[ ]{1,}","",MAR)
+     ABR <- gsub("[ ]{1,}","",ABR)
+     MAY <- gsub("[ ]{1,}","",MAY)
+     JUN <- gsub("[ ]{1,}","",JUN)
+     JUL <- gsub("[ ]{1,}","",JUL)
+     AGO <- gsub("[ ]{1,}","",AGO)
+     SEP <- gsub("[ ]{1,}","",SEP)
+     OCT <- gsub("[ ]{1,}","",OCT)
+     NOV <- gsub("[ ]{1,}","",NOV)
+     DIC <- gsub("[ ]{1,}","",DIC)
+     TOTAL <- gsub("[ ]{1,}","",TOTAL)   
+ })     # vÃ¡lido
+
+```
+
+## Cambio de variables a "numeric"
+```{r ConversiÃ³n numeric, echo = FALSE}
+
+violencia.fuente <- within(violencia.fuente, {
+  SSA <- as.numeric(SSA)
+  IMSS.ORD <- as.numeric(IMSS.ORD)
+  ISSSTE <- as.numeric(ISSSTE)
+  IMSS.OP <- as.numeric(IMSS.OP)
+  DIF.PEMEX <- as.numeric(DIF.PEMEX)
+  SEDENA <- as.numeric(SEDENA)
+  SEDEMAR <- as.numeric(SEDEMAR)
+  OTRAS <- as.numeric(OTRAS)
+  TOTAL <- as.numeric(TOTAL)
+})     # vÃ¡lido vÃ­a sapply(..., class)
+
+# GRUPO
+
+violencia.grupo <- within(violencia.grupo,{
+  X..1 <- as.numeric(X..1)
+  X1...4 <- as.numeric(X1...4)
+  X5...9 <- as.numeric(X5...9)
+  X10...14 <- as.numeric(X10...14)
+  X15...19 <- as.numeric(X15...19)
+  X20...24 <- as.numeric(X20...24)
+  X25...44 <- as.numeric(X25...44)
+  X45...49 <- as.numeric(X45...49)
+  X50...59 <- as.numeric(X50...59)
+  X60...64 <- as.numeric(X60...64)
+  X65.Y.. <- as.numeric(X65.Y..)
+  EDAD.DESC <- as.numeric(EDAD.DESC)
+  TOTAL <- as.numeric(TOTAL)
+})      # vÃ¡lido vÃ­a sapply(..., class)
+
+# MES
+
+violencia.mes <- within(violencia.mes, {
+    ENE <- as.numeric(ENE)
+    FEB <- as.numeric(FEB)
+    MAR <- as.numeric(MAR)
+    ABR <- as.numeric(ABR)
+    MAY <- as.numeric(MAY)
+    JUN <- as.numeric(JUN)
+    JUL <- as.numeric(JUL)
+    AGO <- as.numeric(AGO)
+    SEP <- as.numeric(SEP)
+    OCT <- as.numeric(OCT)
+    NOV <- as.numeric(NOV)
+    DIC <- as.numeric(DIC)
+    TOTAL <- as.numeric(TOTAL)
+})     # vÃ¡lido vÃ­a sapply(..., class)
+
+```
+
+## Formato largo a la tabla para su fÃ¡cil manipulaciÃ³n
+```{r Cambio a formato largo, echo = FALSE}
+
+violencia.fuente.l <- violencia.fuente
+violencia.fuente.l <- melt(data = violencia.fuente.l, variable = "fuente", id.vars = c("ESTADO","YEAR","SEXO"))
+
+violencia.grupo.l <- violencia.grupo
+violencia.grupo.l <- melt(data = violencia.grupo.l, variable = "grupo", id.vars = c("ESTADO","YEAR","SEXO"))
+
+violencia.mes.l <- violencia.mes
+violencia.mes.l <- melt(data = violencia.mes.l, variable = "mes", id = c("ESTADO","YEAR","SEXO"))
+
+```
+
+## Duplicados y Faltantes
+
+```{r Duplicados y Faltantes, echo = FALSE}
+
+#Fuente
+sum(is.na(violencia.fuente.l))      # Missing en variables (1497)
+mean(is.na(violencia.fuente.l))
+
+#Grupo
+sum(is.na(violencia.grupo.l))       # 759
+mean(is.na(violencia.grupo.l))
+
+#Mes
+sum(is.na(violencia.mes.l))         # 1188
+mean(is.na(violencia.mes.l))
+
+# Registros faltantes en cada variable
+
+#Fuente
+sapply(violencia.fuente.l,function(x){mean(is.na(x))})
+#Grupo
+sapply(violencia.grupo.l,function(x){mean(is.na(x))})
+#Mes
+sapply(violencia.mes.l,function(x){mean(is.na(x))})
+
+# Observaciones duplicadas
+
+#Fuente
+sum(duplicated(violencia.fuente.l))
+
+#Grupo
+sum(duplicated(violencia.grupo.l))
+
+#Mes
+sum(duplicated(violencia.mes.l))       # 1665    # 0
+
+#violencia.mes2.l <- subset(violencia.mes.l, YEAR != ".200")
+#violencia.mes2.l <- subset(violencia.mes2.l, YEAR != ".201")
+#sum(duplicated(violencia.mes2.l))
+
+
+# Promedio de observaciones duplicadas
+
+#Fuente
+mean(duplicated(violencia.fuente.l))    # 0
+#Grupo
+mean(duplicated(violencia.grupo.l))     # 0
+#Mes
+mean(duplicated(violencia.mes.l))      # 0
+```
+
+## Resumen de los Data Frames
+
+```{r Resumen, echo = FALSE}
+
+# FUENTE
+summary(violencia.fuente)
+
+# GRUPO
+summary(violencia.grupo)
+
+# MES
+summary(violencia.mes)
+
+# Con violencia.mes.l usar "subset(dataset, YEAR != ".200")"
+
+```
+
+## ComprobaciÃ³n de Totales
+
+```{r Totales, echo = FALSE}
+
+#FUENTE
+col.fuente <- violencia.fuente
+col.fuente$ESTADO <- NULL      # InicializaciÃ³n de vARIABLES
+col.fuente$TOTAL <- NULL
+col.fuente$YEAR <- NULL
+col.fuente$SEXO <- NULL
+
+col.fuente <- replace(col.fuente, is.na(col.fuente), 0)
+totalcol.fuente <- rowSums(col.fuente)
+
+unique(violencia.fuente$TOTAL  == totalcol.fuente)      # ComprobaciÃ³n
+
+#GRUPO
+col.grupo <- violencia.grupo
+col.grupo$ESTADO <- NULL
+col.grupo$TOTAL <- NULL
+col.grupo$YEAR <- NULL
+col.grupo$SEXO <- NULL
+col.grupo <- replace(col.grupo, is.na(col.grupo), 0)
+totalcol.grupo <- rowSums(col.grupo)
+
+unique(violencia.grupo$TOTAL  == totalcol.grupo)     # ComprobaciÃ³n
+
+#Mes
+
+ren.mes <- violencia.mes
+ren.mes$ESTADO <- NULL
+ren.mes$TOTAL <- NULL
+ren.mes$YEAR <- NULL
+ren.mes$SEXO <- NULL
+ren.mes$sexo <- NULL
+ren.mes <- replace(ren.mes, is.na(ren.mes), 0)
+
+totalren.mes<-rowSums(ren.mes)
+
+unique(violencia.mes$TOTAL  == totalren.mes)
+
+#FUENTE
+
+col.fuente <- violencia.fuente
+col.fuente$ESTADO <- NULL
+col.fuente$YEAR <- NULL
+col.fuente$SEXO <- NULL
+col.fuente <- replace(col.fuente, is.na(col.fuente), 0)
+title.fuente <- names(col.fuente)
+
+x <- matrix(ncol=9,nrow=36, dimnames=list(c(1:36),title.fuente))
+
+for (i in 1:36){
+   x[i,1:9]<-c((colSums(col.fuente[(1+(36*(i-1))):(35 + (36*(i-1))),1:9]))== col.fuente[(36+(36*(i-1))),1:9])}
+
+unique(x)   # ComprobaciÃ³n
+
+#GRUPO
+
+col.grupo <- violencia.grupo
+col.grupo$ESTADO <- NULL
+col.grupo$YEAR <- NULL
+col.grupo$SEXO <- NULL
+col.grupo <- replace(col.grupo, is.na(col.grupo), 0)
+title.grupo<-names(col.grupo)
+
+x <- matrix(ncol=13,nrow=36, dimnames=list(c(1:36),title.grupo))
+
+for (i in 1:36){
+  x[i,1:13]<-c((colSums(col.grupo[(1+(36*(i-1))):(35+(36*(i-1))),1:13]))== col.grupo[(36+(36*(i-1))),1:13])}
+
+unique(x)      # ComprobaciÃ³n
+
+# MES
+
+col.mes <- violencia.mes
+col.mes$ESTADO <- NULL
+col.mes$YEAR <- NULL
+col.mes$SEXO <- NULL
+col.mes$sexo <- NULL
+col.mes <- replace(col.mes, is.na(col.mes), 0)
+title.mes<-names(col.mes)
+
+x <- matrix(ncol=13,nrow=36, dimnames=list(c(1:36),title.mes))
+
+for (i in 1:36){
+  x[i,1:13] <- c((colSums(col.mes[(1+(36*(i-1))):(35+(36*(i-1))),1:13]))== col.mes[(36+(36*(i-1))),1:13])}
+
+unique(x) # ComprobaciÃ³n
+
+```
+
+
+## Observaciones por SEXO
+```{r Observaciones sexo, echo=FALSE}
+
+#FUENTE
+Sexo.fuente <- aggregate(.~SEXO,data=violencia.fuente, sum)
+
+for (i in 3:12){
+  Sexo.fuente [4,i] <- Sexo.fuente[2,i]-(Sexo.fuente[1,i] + Sexo.fuente[3,i])
+}
+ 
+Sexo.fuente
+
+#GRUPO
+Sexo.grupo <- aggregate(.~SEXO,data=violencia.grupo, sum)
+
+for (i in 3:16){
+  Sexo.grupo [4,i] <- Sexo.grupo[2,i]-(Sexo.grupo[1,i]+Sexo.grupo[3,i])
+}
+
+Sexo.grupo
+
+#MES
+
+violencia.mes$sexo <- NULL
+Sexo.mes <- aggregate(.~ SEXO,data=violencia.mes, sum)
+
+for (i in 3:16){
+  Sexo.mes [4,i] <- Sexo.mes[2,i]-(Sexo.mes[1,i]+Sexo.mes[3,i])
+}
+
+Sexo.mes
+
+```
+
+## Pruebas de RazÃ³n
+Se comprueba que los nÃºmeros de casos sean iguales entre los tres tipos de base
+```{r Prueba de RazÃ³n, echo=FALSE}
+
+violencia.fuente.r <- violencia.fuente.l
+violencia.fuente.r <- replace(violencia.fuente.r, is.na(violencia.fuente.r), 0)
+
+violencia.grupo.r<-violencia.grupo.l
+violencia.grupo.r <- replace(violencia.grupo.r, is.na(violencia.grupo.r), 0)
+
+violencia.mes.r<-violencia.mes.l
+violencia.mes.r <- replace(violencia.mes.r, is.na(violencia.mes.r), 0)
+
+# ComprobaciÃ³n mediante cociente
+
+                                    #as.numeric(...)
+#((sum(violencia.fuente.r$value))/(sum(violencia.mes.r$value))) == 1  
+
+#((sum(violencia.grupo.r$value))/(sum(violencia.mes.r$value))) == 1
+
+```
+
+## DetecciÃ³n de Outliers
+
+```{r Outliers, echo=FALSE}
+
+violencia.fuente.lo<-violencia.fuente.l
+violencia.fuente.lo<-subset(violencia.fuente.lo, fuente=="TOTAL")
+violencia.fuente.lo<-subset(violencia.fuente.lo, SEXO!="GENERAL")
+violencia.fuente.lo<-subset(violencia.fuente.lo, ESTADO=="TOTAL")
+
+# Graficamos
+graf_1 <- ggplot(violencia.fuente.lo) + geom_point(aes(x=YEAR,y=value, colour = SEXO,fill=SEXO),size=3) + labs(title="Violencia intra familiar por Sexo", x="Sexo", y= "Casos de violencia")
+
+graf_1
+
+# Guardamos grÃ¡ficos
+ggsave("./GRAFICAS/EXPLORATORIAS/graf_1.pdf", width=8, height=8)
+
+```
+
+
+## Analisis Exploratorio de Datos
+
+```{r Analisis Exploratorio de Datos - Tiempo, echo=FALSE}
+
+#Graficas por Sexo a lo largo de los aÃ±os
+
+violencia.mes.ls <- violencia.mes.l
+violencia.mes.ls <- subset(violencia.mes.ls, mes!="TOTAL")
+
+violencia.mes.ls$sexo <- gsub("g","TOTAL (M+F)",violencia.mes.ls$SEXO)
+
+violencia.mes.ls <- subset(violencia.mes.ls,ESTADO == "TOTAL")
+
+graf_2 <- ggplot(violencia.mes.ls, aes(x = YEAR, y =value, fill = SEXO)) + geom_boxplot(stat="boxplot")  + labs(title="Violencia intrafamiliar por Sexo",x="AÃ±o", y="Casos de violencia intrafamiliar") + facet_grid( .~SEXO, scales = "fixed",space="fixed") + theme_bw() 
+
+ggsave("./GRAFICAS/EXPLORATORIAS/graf_2.pdf", width=8, height=8)
+
+# DistribuciÃ³n por mes a lo largo de los aÃ±os 
+violencia.mes.l1<-violencia.mes.l
+violencia.mes.l1<-subset(violencia.mes.l1, mes!="TOTAL")
+violencia.mes.l1<-subset(violencia.mes.l1, SEXO!="g")
+violencia.mes.l1<-subset(violencia.mes.l1, ESTADO=="TOTAL")
+
+violencia.mes.l1$value <- replace(violencia.mes.l1$value, is.na(violencia.mes.l1$value), 0)
+
+#graf_3 <- ggplot(violencia.mes.l1, aes(x=mes, y=value)) + geom_boxplot(fill=mes, stat="boxplot")  + labs(title="Violencia intrafamiliar por Mes del 2003 al 2014",x="Mes", y="Casos de violencia")+ facet_grid( SEXO~., scales="fixed",space="fixed")+ theme_bw()
+
+ggsave("./GRAFICAS/EXPLORATORIAS/graf_3.pdf", width=8, height=8)
+
+```
+
+# Violencia por Estado
+```{rAnalisis exploratorio de datos- Estado, echo=FALSE}
+
+# Graficas por SexO
+violencia.mes.l2<-violencia.mes.l
+violencia.mes.l2$value <- (as.numeric(violencia.mes.l2$value)/1000)
+violencia.mes.l2<-subset(violencia.mes.l2,ESTADO!="TOTAL")
+violencia.mes.l2<-subset(violencia.mes.l2,mes=="TOTAL")
+violencia.mes.l2<-subset(violencia.mes.l2,SEXO=="g")
+
+head(violencia.mes.l2)
+
+graf_4 <- ggplot(violencia.mes.l2,aes(x=ESTADO,y=value,fill=YEAR))+labs(title="Violencia intrafamiliar por Estado, en PoblaciÃ³n Total",x="Estado", y="Casos de Violencia (Miles)")+geom_bar(stat="identity")+  theme_bw()+ coord_flip()
+
+ggsave("./GRAFICAS/EXPLORATORIAS/graf_4.pdf", width=8, height=8)
+```
+
+## AnÃ¡lisis por Fuente y Grupo de Edad
+
+```{r Analisis Exploratorio Fuente y Grupo, echo=FALSE}
+
+violencia.fuente.l2 <- violencia.fuente.l
+violencia.fuente.l2 <- subset(violencia.fuente.l2, ESTADO == "TOTAL")
+violencia.fuente.l2 <- subset(violencia.fuente.l2, SEXO == "General")
+
+#graf_5 <- ggplot(data = violencia.fuente.l2, aes(fuente, value, fill = YEAR)) + geom_bar(stat="identity")  + facet_wrap(~ YEAR, ncol = 1) + theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5), strip.text = element_text(face = "bold"), strip.background = element_blank(), panel.border = element_rect(colour = grey(.90)), axis.ticks = element_line(colour=grey(.90), size = .5), axis.text = element_text(colour=grey(.65)), axis.title = element_text(colour=grey(.75)), legend.key = element_blank()) + theme_bw()+labs(title = "Violencia intrafamiliar por fuente)", x = "Fuente de NotificaciÃ³n", y = "Casos de violencia intrafamiliar")
+
+ggsave("./GRAFICAS/EXPLORATORIAS/graf_5.pdf", width=8, height=8)
+
+
+violencia.grupo.ls <- violencia.grupo.l
+violencia.grupo.ls <- subset(violencia.grupo.ls, grupo!="total")
+violencia.grupo.ls$grupo <- gsub(".*x10...14*","10 a 14", violencia.grupo.ls$grupo)
+violencia.grupo.ls$grupo <- gsub(".*x20...24*","20 a 24",violencia.grupo.ls$grupo)
+violencia.grupo.ls$grupo <- gsub(".*x25...44*","25 a 44",violencia.grupo.ls$grupo)
+violencia.grupo.ls$grupo <- gsub(".*x45...49*","45 a 49",violencia.grupo.ls$grupo)
+violencia.grupo.ls$grupo <- gsub(".*x50...59*","50 a 59",violencia.grupo.ls$grupo)
+violencia.grupo.ls$grupo <- gsub(".*x60...64*","60 a 64",violencia.grupo.ls$grupo)
+violencia.grupo.ls$grupo <- gsub(".*x65.y..*","65 o mas",violencia.grupo.ls$grupo)
+violencia.grupo.ls$grupo <- gsub(".*edad.desconocidad*","edad.desc.",violencia.grupo.ls$grupo)
+violencia.grupo.ls$grupo <- gsub(".*x15...19*","15 a 19",violencia.grupo.ls$grupo)
+violencia.grupo.ls$grupo <- gsub(".*x5...9*","5 a 9",violencia.grupo.ls$grupo)
+violencia.grupo.ls$grupo <- gsub(".*x1...4*","1 a 4",violencia.grupo.ls$grupo)
+violencia.grupo.ls$grupo <- gsub(".*x..1*","0 a 1",violencia.grupo.ls$grupo)
+
+violencia.grupo.ls<-subset(violencia.grupo.ls, ESTADO == "TOTAL")
+violencia.grupo.ls<-subset(violencia.grupo.ls, SEXO!="General")
+violencia.grupo.ls$grupo<-as.factor(violencia.grupo.ls$grupo)
+
+graf_6 <- ggplot(violencia.grupo.ls,aes(x =grupo, y =value ,fill=SEXO)) + geom_boxplot(stat="boxplot")  +labs(title="Casos de violencia intrafamiliar por Grupo de edad",x="Casos de Violencia", y="Grupo de edad")+ facet_grid(SEXO~., scales="fixed",space="fixed")+ theme_bw()  + coord_flip()
+
+ggsave("./GRAFICAS/EXPLORATORIAS/graf_6.pdf", width=8, height=8)
+
+
+
+
+```
+
+
+## Guardado de Datos Procesados
+```{r Datos Finales, echo=FALSE}
+
+# Formato Long
+write.csv(violencia.fuente.l,file="./DATOS/PROCESADOS/fuente_l.csv")
+write.csv(violencia.grupo.l,file="./DATOS/PROCESADOS/grupo_l.csv")
+write.csv(violencia.mes.l,file="./DATOS/PROCESADOS/mes_l.csv")
+
+save(violencia.fuente.l, file="./DATOS/PROCESADOS/fuente_l.RData")
+save(violencia.grupo.l, file="./DATOS/PROCESADOS/grupo_l.RData")
+save(violencia.mes.l, file="./DATOS/PROCESADOS/mes_l.RData")
+
+# Formato Short
+write.csv(violencia.fuente,file="./DATOS/PROCESADOS/fuente_s.csv")
+write.csv(violencia.grupo,file="./DATOS/PROCESADOS/grupo_s.csv")
+write.csv(violencia.mes,file="./DATOS/PROCESADOS/mes_s.csv")
+
+save(violencia.fuente, file="./DATOS/PROCESADOS/fuente_s.RData")
+save(violencia.grupo, file="./DATOS/PROCESADOS/grupo_s.RData")
+save(violencia.mes, file="./DATOS/PROCESADOS/mes_s.RData")
+
+# Graficas
+ggsave("./GRAFICAS/FINALES/graf_4.pdf", width=8, height=8)
+ggsave("./GRAFICAS/FINALES/graf_5.pdf", width=8, height=8)
+ggsave("./GRAFICAS/FINALES/graf_3.pdf", width=8, height=8)
+ggsave("./GRAFICAS/FINALES/graf_2.pdf", width=8, height=8)
+ggsave("./GRAFICAS/FINALES/graf_6.pdf", width=8, height=8)
+```
+
