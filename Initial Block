@@ -1,0 +1,28 @@
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+### Vemos nuestro directorio
+```{r}
+getwd()
+```
+
+### Cambiamos a la carpeta con los archivos
+```{r}
+setwd("C:/Users/...")
+
+getwd()
+```
+
+
+### Paquetería a usar
+```{r}
+#install.packages("dplyr")
+#install.packages("pastecs")
+#install.packages("stringi")
+
+library("dplyr")
+library("pastecs")
+#library("stringi")
+```
