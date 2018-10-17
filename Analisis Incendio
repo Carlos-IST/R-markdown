@@ -1,0 +1,447 @@
+---
+title: "Analisis Incendio"
+author: "Carlos Santillán"
+date: "9 de octubre de 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Vemos nuestro directorio
+```{r}
+getwd()
+```
+
+### Cambiamos a la carpeta con los archivos
+```{r}
+setwd("C:/Users/S8C9V6/Desktop/Bases CNSF/Incendio/CSV Incendio")
+
+getwd()
+```
+
+
+### Paquetería a usar
+```{r}
+#install.packages("dplyr")
+#install.packages("pastecs")
+#install.packages("stringi")
+
+library("dplyr")
+library("pastecs")
+#library("stringi")
+```
+
+### Inicializamos Variables
+```{r}
+precartera.inc <- NULL
+
+siniestralidad.inc <- NULL
+
+inc.emision <- NULL
+
+inc.suma.asegurada <- NULL
+
+inc.siniestros <- NULL
+
+#id.year.emision <- NULL
+
+```
+
+### Importamos las Emisiones de 2015 a 2016
+```{r}
+for (i in 1:2){
+  inc.emision[[i]] <- read.csv(paste("C:/Users/S8C9V6/Desktop/Bases CNSF/Incendio/CSV Incendio/", i+2014," Incendio Bases EM.csv", sep = ""), stringsAsFactors = FALSE)
+  #id.year.emision[i] <- paste("year.emision", i+2014, sep = "")
+} 
+```
+
+### Visualizamos un año
+Recordemos que: 1 es 2015 y 2 es 2016
+```{r}
+head(inc.emision[2])
+```
+
+```{r}
+inc.emision.hist$LMR_CORRECT <- inc.emision.hist$VALORES.TOTALES.CONTENIDO + inc.emision.hist$VALORES.TOTALES.EDIFICIO + inc.emision.hist$VALORES.TOTALES.EXISTENCIAS + inc.emision.hist$VALORES.TOTALES.PÉRDIDAS.CONSECUENCIALES
+
+inc.emision.hist$LMR_PROM <- inc.emision.hist$LMR_CORRECT / inc.emision.hist$NÚMERO.DE.UBICACIONES
+
+stat.desc(inc.emision.hist$LMR_PROM)
+
+```
+
+
+
+### Obtenemos los nombres de las variables
+```{r}
+names(inc.emision[[2]])
+names(inc.emision[[1]])
+
+```
+
+Concluimos que 2015 y 2016 **tienen los mismos atributos**, podemos unir los data frames
+
+### Unimos (verticalmente) los dataframes para los años 2015 y 2016
+```{r}
+inc.emision.hist <- rbind(inc.emision[[2]], inc.emision[[1]])
+
+head(inc.emision.hist)   # Visualizamos primeros registros
+
+tail(inc.emision.hist)   # Visualizamos últimos registros
+
+
+```
+
+### Revisamos atributos
+```{r}
+str(inc.emision.hist)
+
+head(inc.emision.hist)
+
+tail(inc.emision.hist)
+```
+
+## Suma Asegurada
+
+### Importamos las Sumas Aseguradas de 2015 a 2016
+```{r}
+for (i in 1:2){
+  inc.suma.asegurada[[i]] <- read.csv(paste("C:/Users/S8C9V6/Desktop/Bases CNSF/Incendio/CSV Incendio/", i+2014," Incendio Bases SA.csv", sep = ""), stringsAsFactors = FALSE)
+  #id.year.emision[i] <- paste("year.emision", i+2014, sep = "")
+} 
+```
+
+### Visualizamos un año
+Recordemos que: 1 es 2015 y 2 es 2016
+```{r}
+head(inc.suma.asegurada[2])
+```
+
+### Obtenemos los nombres de las variables
+```{r}
+names(inc.suma.asegurada[[2]])
+names(inc.suma.asegurada[[1]])
+```
+
+Concluimos que 2015 y 2016 **tienen los mismos atributos**, podemos unir los data frames
+
+### Unimos (verticalmente) los dataframes para los años 2015 y 2016
+```{r}
+inc.suma.asegurada.hist <- rbind(inc.suma.asegurada[[2]], inc.suma.asegurada[[1]])
+
+head(inc.suma.asegurada.hist)   # Visualizamos primeros registros
+
+tail(inc.suma.asegurada.hist)   # Visualizamos últimos registros
+
+```
+
+Podemos confirmar mediante la visualización que la unión de las tablas fue correcta
+
+### Revisamos las variables del dataframe resultante de la unión
+```{r}
+str(tev.suma.asegurada.hist)
+```
+
+### Revisamos atributos
+```{r}
+str(inc.suma.asegurada.hist)
+
+head(inc.suma.asegurada.hist)
+
+tail(inc.suma.asegurada.hist)
+```
+
+
+
+## Siniestros
+
+### Importamos los Siniestros de 2015 a 2016
+```{r}
+for (i in 1:2){
+  inc.siniestros[[i]] <- read.csv(paste("C:/Users/S8C9V6/Desktop/Bases CNSF/Incendio/CSV Incendio/", i+2014," Incendio Bases SIN.csv", sep = ""), stringsAsFactors = FALSE)
+  #id.year.emision[i] <- paste("year.emision", i+2014, sep = "")
+} 
+```
+
+### Visualizamos un año
+Recordemos que: 1 es 2015 y 2 es 2016
+```{r}
+head(inc.siniestros[2])
+```
+
+### Obtenemos los nombres de las variables
+```{r}
+names(inc.siniestros[[2]])
+names(inc.siniestros[[1]])
+```
+
+Concluimos que 2015 y 2016 **tienen los mismos atributos**, debemos añadir columnas a 2016 para poder unir los data frames
+
+
+
+### Unimos (verticalmente) los dataframes para los años 2015 y 2016
+```{r}
+inc.siniestros.hist <- rbind(inc.siniestros[[2]], inc.siniestros[[1]])
+
+head(inc.siniestros.hist)   # Visualizamos primeros registros
+
+tail(inc.siniestros.hist)   # Visualizamos últimos registros
+
+```
+
+### Revisamos atributos
+```{r}
+str(inc.siniestros.hist)
+
+head(inc.siniestros.hist)
+
+tail(inc.siniestros.hist)
+```
+
+### Exportamos a Excel los data frames de EM, SA y SIN
+```{r}
+write.csv(inc.emision.hist, file = "./EM_HIST.csv")
+write.csv(inc.suma.asegurada.hist, file = "./SA_HIST.csv")
+#write.csv(inc.siniestros.hist, file = "./SIN_HIST.csv")
+```
+
+
+### Visualizamos Emisión y Suma Asegurada
+```{r}
+names(inc.emision.hist)
+names(inc.suma.asegurada.hist)
+
+nrow(inc.emision.hist)
+nrow(inc.suma.asegurada.hist)
+
+```
+
+**EM y SA tienen pocos atributos en común**, de hecho, sólo podrá formarse la llave con:
+
+- YEAR
+
+- ENTIDAD
+
+- TIPO.PRIMER.RIESGO
+
+- SUBTIPO.DE.SEGURO
+
+Además en cuanto a registros:
+
+- EM tiene 157,087
+
+- SA tiene 399,307
+
+### Visualizamos variables de Suma AAsegurAda y Siniestros
+```{r}
+names(inc.suma.asegurada.hist)
+names(inc.siniestros.hist)
+
+nrow(inc.suma.asegurada.hist)
+nrow(inc.siniestros.hist)
+```
+
+**Variables a usar para unir SA y SIN:**
+
+- COBERTURA
+
+- TIPO.BIEN
+
+- TIPO.PRIMER.RIESGO
+
+- ENTIDAD
+
+- YEAR
+
+
+
+### Exportamos a Excel los data frames de EM y SA
+```{r}
+write.csv(inc.emision.hist, file = "./EM_HIST.csv")
+write.csv(inc.suma.asegurada.hist, file = "./SA_HIST.csv")
+#write.csv(inc.siniestros.hist, file = "./SIN_HIST.csv")
+```
+
+### Visualizamos Valores dentro de las variables para merge
+```{r}
+em.entidad <- unique(inc.emision.hist$ENTIDAD)
+em.subtipo.seguro <- unique(inc.emision.hist$SUBTIPO.DE.SEGURO)
+em.tipo.primer.riesgo <- unique(inc.emision.hist$TIPO.PRIMER.RIESGO)
+
+#sa.moneda <- unique(tev.suma.asegurada.hist$MONEDA)
+#sa.forma.venta <- unique(tev.suma.asegurada.hist$FORMA.DE.VENTA)
+#em.giro <- unique(tev.emision.hist$GIRO)
+sa.entidad <- unique(inc.suma.asegurada.hist$ENTIDAD)
+#sa.zona <- unique(tev.suma.asegurada.hist$ZONA)
+#sa.tipo.cartera <- unique(tev.suma.asegurada.hist$TIPO.DE.CARTERA)
+#sa.tipo.aseg <- unique(tev.suma.asegurada.hist$TIPO.DE.ASEGURAMIENTO)
+#em.tipo.seguro <- unique(diversos.suma.asegurada.hist$TIPO.DE.SEGURO)
+#sa.subtipo.seguro <- unique(tev.suma.asegurada.hist$SUBTIPO.DE.SEGURO)
+#sa.industrial <- unique(tev.suma.asegurada.hist$INDUSTRIAL)
+sa.tipo.primer.riesgo <- unique(inc.suma.asegurada.hist$TIPO.PRIMER.RIESGO)
+sa.tipo.bien <- unique(inc.suma.asegurada.hist$TIPO.DE.BIEN)
+sa.cobertura <- unique(inc.suma.asegurada.hist$COBERTURA)
+
+
+
+#sin.moneda <- unique(tev.siniestros.hist$MONEDA)
+#sin.forma.venta <- unique(tev.siniestros.hist$FORMA.DE.VENTA)
+sin.entidad <- unique(inc.siniestros.hist$ENTIDAD)
+#sin.tipo.seguro <- unique(diversos.siniestros.hist$TIPO.DE.SEGURO)
+#sin.zona <- unique(tev.siniestros.hist$ZONA.SISMICA)
+#sin.tipo.cartera <- unique(tev.siniestros.hist$TIPO.DE.CARTERA)
+#sin.tipo.aseg <- unique(tev.siniestros.hist$TIPO.DE.ASEGURAMIENTO)
+#sin.subtipo.seguro <- unique(tev.siniestros.hist$SUBTIPO.DE.SEGURO)
+#sin.industrial <- unique(tev.siniestros.hist$INDUSTRIAL)
+sin.tipo.primer.riesgo <- unique(inc.siniestros.hist$TIPO.PRIMER.RIESGO)
+sin.tipo.bien <- unique(inc.siniestros.hist$TIPO.DE.BIEN)
+sin.cobertura <- unique(inc.siniestros.hist$COBERTURA)
+
+```
+
+### Importamos filtrados históricos de Access
+
+
+### Reemplazamos valores en las key variables
+```{r}
+#tev.emision.hist$FORMA.DE.VENTA[tev.emision.hist$FORMA.DE.VENTA == "Fuerza Venta Interna o Matriz"] <- "Fuerza de Venta Interna o Casa Matriz"
+
+#tev.suma.asegurada.hist$FORMA.DE.VENTA[tev.suma.asegurada.hist$FORMA.DE.VENTA == "Fuerza Venta Interna o Matriz"] <- "Fuerza de Venta Interna o Casa Matriz"
+
+#tev.siniestros.hist$FORMA.DE.VENTA[tev.siniestros.hist$FORMA.DE.VENTA == "Fuerza Venta Interna o Matriz"] <- "Fuerza de Venta Interna o Casa Matriz"
+
+
+# Variable ENTIDAD de Suma Asegurada
+inc.suma.asegurada.hist$ENTIDAD[inc.suma.asegurada.hist$ENTIDAD == "EN EL EXTRANJERO"] <- "Extranjero"
+
+inc.suma.asegurada.hist$ENTIDAD[inc.suma.asegurada.hist$ENTIDAD == "MEXICO"] <- "Estado de México"
+
+inc.suma.asegurada.hist$ENTIDAD[inc.suma.asegurada.hist$ENTIDAD == "MICHOACAN"] <- "Michoacán"
+
+inc.suma.asegurada.hist$ENTIDAD[inc.suma.asegurada.hist$ENTIDAD == "NUEVO LEON"] <- "Nuevo León"
+
+inc.suma.asegurada.hist$ENTIDAD[inc.suma.asegurada.hist$ENTIDAD == "QUERETARO"] <- "Querétaro"
+
+inc.suma.asegurada.hist$ENTIDAD[inc.suma.asegurada.hist$ENTIDAD == "SAN LUIS POTOSI"] <- "San Luis Potosí"
+
+inc.suma.asegurada.hist$ENTIDAD[inc.suma.asegurada.hist$ENTIDAD == "YUCATAN"] <- "Yucatán"
+
+# Variable ENTIDAD de Siniestros
+#inc.siniestros.hist$ENTIDAD[inc.siniestros.hist$ENTIDAD == "EN EL EXTRANJERO"] <- "Extranjero"
+
+#inc.siniestros.hist$ENTIDAD[inc.siniestros.hist$ENTIDAD == "MEXICO"] <- "Estado de México"
+
+#inc.siniestros.hist$ENTIDAD[inc.siniestros.hist$ENTIDAD == "MICHOACAN"] <- "Michoacán"
+
+#inc.siniestros.hist$ENTIDAD[inc.siniestros.hist$ENTIDAD == "NUEVO LEON"] <- "Nuevo León"
+
+#inc.siniestros.hist$ENTIDAD[inc.siniestros.hist$ENTIDAD == "QUERETARO"] <- "Querétaro"
+
+#inc.siniestros.hist$ENTIDAD[inc.siniestros.hist$ENTIDAD == "SAN LUIS POTOSI"] <- "San Luis Potosí"
+
+#inc.siniestros.hist$ENTIDAD[inc.siniestros.hist$ENTIDAD == "YUCATAN"] <- "Yucatán"
+
+# Variable de ENTIDAD en Emisión
+inc.emision.hist$ENTIDAD[inc.emision.hist$ENTIDAD == "EN EL EXTRANJERO"] <- "Extranjero"
+
+inc.emision.hist$ENTIDAD[inc.emision.hist$ENTIDAD == "MEXICO"] <- "Estado de México"
+
+inc.emision.hist$ENTIDAD[inc.emision.hist$ENTIDAD == "MICHOACAN"] <- "Michoacán"
+
+inc.emision.hist$ENTIDAD[inc.emision.hist$ENTIDAD == "NUEVO LEON"] <- "Nuevo León"
+
+inc.emision.hist$ENTIDAD[inc.emision.hist$ENTIDAD == "QUERETARO"] <- "Querétaro"
+
+inc.emision.hist$ENTIDAD[inc.emision.hist$ENTIDAD == "SAN LUIS POTOSI"] <- "San Luis Potosí"
+
+inc.emision.hist$ENTIDAD[inc.emision.hist$ENTIDAD == "YUCATAN"] <- "Yucatán"
+
+# Variable INDUSTRIAL en Emisión
+#tev.emision.hist$INDUSTRIAL[tev.emision.hist$INDUSTRIAL == "Sí"] <- "Si"
+
+# Variable TIPO DE BIEN en Suma Asegurada
+inc.suma.asegurada.hist$TIPO.DE.BIEN[inc.suma.asegurada.hist$TIPO.DE.BIEN == "Contenidos y Perdidas Consecue"] <- "Contenidos y Pérdidas Consecuenciales"
+
+inc.suma.asegurada.hist$TIPO.DE.BIEN[inc.suma.asegurada.hist$TIPO.DE.BIEN == "Contenidos y Perdidas Consecuenciales"] <- "Contenidos y Pérdidas Consecuenciales"
+
+inc.suma.asegurada.hist$TIPO.DE.BIEN[inc.suma.asegurada.hist$TIPO.DE.BIEN == "Edificio y Pérdidas Consecuenc"] <- "Edificio y Pérdidas Consecuenciales"
+
+inc.suma.asegurada.hist$TIPO.DE.BIEN[inc.suma.asegurada.hist$TIPO.DE.BIEN == "Existencias / Bienes Bajo Conv"] <- "Existencias / Bienes Bajo Convenio Expreso"
+
+inc.suma.asegurada.hist$TIPO.DE.BIEN[inc.suma.asegurada.hist$TIPO.DE.BIEN == "Perdidas Consecuenciales"] <- "Pérdidas Consecuenciales"
+
+
+# Variable TIPO DE BIEN en Siniestros
+#inc.siniestros.hist$TIPO.DE.BIEN[inc.siniestros.hist$TIPO.DE.BIEN == "Contenidos y Perdidas Consecue"] <- "Contenidos y Pérdidas Consecuenciales"
+
+#inc.siniestros.hist$TIPO.DE.BIEN[inc.siniestros.hist$TIPO.DE.BIEN == "Contenidos y Perdidas Consecuenciales"] <- "Contenidos y Pérdidas Consecuenciales"
+
+
+#inc.siniestros.hist$TIPO.DE.BIEN[inc.siniestros.hist$TIPO.DE.BIEN == "Edificio y Pérdidas Consecuenc"] <- "Edificio y Pérdidas Consecuenciales"
+
+#inc.siniestros.hist$TIPO.DE.BIEN[inc.siniestros.hist$TIPO.DE.BIEN == "Existencias / Bienes Bajo Conv"] <- "Existencias / Bienes Bajo Convenio Expreso"
+
+#inc.siniestros.hist$TIPO.DE.BIEN[inc.siniestros.hist$TIPO.DE.BIEN == "Perdidas Consecuenciales"] <- "Pérdidas Consecuenciales"
+
+# Variable COBERTURA para Suma Asegurada
+inc.suma.asegurada.hist$COBERTURA[inc.suma.asegurada.hist$COBERTURA == "Gastos Extraodinarios"] <- "Gastos Extraordinarios"
+
+# Variable COBERTURA para Emisión
+#inc.siniestros.hist$COBERTURA[inc.siniestros.hist$COBERTURA == "Gastos Extraodinarios"] <- "Gastos Extraordinarios"
+
+```
+
+### Exportamos tablas para agrupar en Access
+```{r}
+head(inc.emision.hist)
+head(inc.suma.asegurada.hist)
+#head(inc.siniestros.hist)
+
+write.csv(inc.emision.hist, file = "C:/Users/S8C9V6/Desktop/Bases CNSF/Incendio/CSV Incendio/EM_HIST_ACCESS.csv")
+write.csv(inc.suma.asegurada.hist, file = "C:/Users/S8C9V6/Desktop/Bases CNSF/Incendio/CSV Incendio/SA_HIST_ACCESS.csv")
+#write.csv(inc.siniestros.hist, file = "./SIN_HIST_ACCESS.csv")
+```
+
+### Importamos EM_SA y SA_SIN para hacer cortes de Suma Asegurada 
+```{r}
+em.sa <- read.csv("C:/Users/S8C9V6/Desktop/Bases CNSF/Incendio/CSV Incendio/EM_SA.csv")
+
+sa.sin <- read.csv("C:/Users/S8C9V6/Desktop/Bases CNSF/Incendio/CSV Incendio/SA_SIN.csv")
+
+head(em.sa)
+tail(em.sa)
+
+head(sa.sin)
+tail(sa.sin)
+
+```
+
+### Tomemos un corte a 2,546,721 en LMR_PROMEDIO para EM_SA
+```{r}
+em.sa.lmr.filter <- em.sa[which(em.sa$LMR_PROMEDIO > 2546721), ]
+
+stat.desc(em.sa.lmr.filter$LMR_PROMEDIO)
+quantile(em.sa.lmr.filter$LMR_PROMEDIO, prob = c(.65, .75, .8, .9))
+
+```
+
+### Generamos variable de SA_PROMEDIO en SA_SI
+```{r}
+sa.sin$SA_PROMEDIO <- sa.sin$SA / sa.sin$NUM_UBI_SA
+
+head(sa.sin)
+```
+
+
+### Tomemos un corte a 2,546,721 en SA_PROMEDIO para SA_SIN
+```{r}
+sa.sin.lmr.filter <- sa.sin[which(sa.sin$SA_PROMEDIO > 2546721), ]
+
+stat.desc(sa.sin.lmr.filter$SA_PROMEDIO)
+quantile(sa.sin.lmr.filter$SA_PROMEDIO, prob = c(.65, .75, .8, .9))
+
+```
+
+
