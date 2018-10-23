@@ -1,0 +1,13 @@
+### Importamos las Emisiones de 2015 a 2016
+```{r}
+for (i in 1:2){
+  diversos.emision[[i]] <- read.csv(paste("C:/Users/S8C9V6/Desktop/Bases CNSF/Diversos/CSV Diversos/", i+2014," Diversos Misc Bases EM.csv", sep = ""), stringsAsFactors = FALSE)
+  id.year.emision[i] <- paste("year.emision", i+2014, sep = "")
+} 
+```
+
+### Visualizamos un año
+Recordemos que: 1 es 2015 y 2 es 2016
+```{r}
+diversos.emision[2]
+```
