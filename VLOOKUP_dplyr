@@ -2,8 +2,8 @@
 # VLOOKUP functionality using 'dplyr' package
 ## We want to paste into data.frame.1 the values from data.frame.2 according to a key.variable
 
-data_frame_1 =
-  data_frame_2 %>%                                ### activate data.frame.2
+data.frame.1 =
+  data.frame.2 %>%                                ### activate data.frame.2
   select(value.to.paste, key.variable) %>%        ### select values and key variable
   distinct() %>%                                  ### keep only distinct (unique) values
   right_join(data.frame.1, by = 'key.variable')   ### join from the right to data.frame.1 acc. to key variable
